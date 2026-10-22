@@ -1,0 +1,7 @@
+import express from "express";
+const app = express();
+const port = 3000;
+app.listen(port, () => {
+    console.log(`Server listening port http://localhost:${port}`);
+});
+//# sourceMappingURL=server.js.map
