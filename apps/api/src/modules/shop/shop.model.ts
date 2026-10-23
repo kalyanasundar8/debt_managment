@@ -29,5 +29,7 @@ const ShopSchema = new Schema<IShop>(
   { timestamps: true },
 );
 
+ShopSchema.index({ email: 1 }, { unique: true });
+
 export const Shop = model<IShop>("Shop", ShopSchema);
 export type ShopDocument = HydratedDocument<IShop>;

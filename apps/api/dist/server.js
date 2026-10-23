@@ -1,7 +1,14 @@
 import express from "express";
+import "dotenv/config";
+import cors from "cors";
+import shopRoutes from "./modules/shop/shop.routes.js";
+import { logger } from "./shared/utils/logger.js";
 const app = express();
-const port = 3000;
+app.use(cors());
+app.use(express.json());
+const port = process.env.PORT || 3001;
+app.use("/api/shops", shopRoutes);
 app.listen(port, () => {
-    console.log(`Server listening port http://localhost:${port}`);
+    logger.info(`Server listening port http://localhost:${port}`);
 });
 //# sourceMappingURL=server.js.map
