@@ -14,7 +14,7 @@ ConnectMongo();
 
 const port = process.env.PORT || 3001;
 
-app.use("/api/shops", shopRoutes);
+app.use("/api/v1/shops", shopRoutes);
 
 app.listen(port, () => {
   logger.info(`Server listening port http://localhost:${port}`);

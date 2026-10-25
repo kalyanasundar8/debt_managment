@@ -13,11 +13,11 @@ export class ShopService {
     }
 
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(shopData.hashedPassword, salt);
+    const passwordHash = await bcrypt.hash(shopData.passwordHash, salt);
 
     const shop = await Shop.create({
       ...shopData,
-      hashedPassword,
+      passwordHash,
       createdAt: Date.now(),
     });
 

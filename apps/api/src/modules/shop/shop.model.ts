@@ -3,7 +3,7 @@ import mongoose, { model, Schema, type HydratedDocument } from "mongoose";
 export interface IShop {
   shopName: string;
   email: string;
-  hashedPassword: string;
+  passwordHash: string;
   createdAt: Date;
 }
 
@@ -17,7 +17,7 @@ const ShopSchema = new Schema<IShop>(
       type: String,
       required: true,
     },
-    hashedPassword: {
+    passwordHash: {
       type: String,
       required: true,
     },
