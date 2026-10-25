@@ -4,6 +4,7 @@ import cors from "cors";
 import shopRoutes from "./modules/shop/shop.routes.js";
 import { logger } from "./shared/utils/logger.js";
 import { ConnectMongo } from "./shared/config/mongo.connect.js";
+import userRoutes from "./modules/user/user.routes.js";
 
 const app = express();
 
@@ -14,7 +15,8 @@ ConnectMongo();
 
 const port = process.env.PORT || 3001;
 
-app.use("/api/v1/shops", shopRoutes);
+app.use("/api/shops", shopRoutes);
+app.use("/api/users", userRoutes);
 
 app.listen(port, () => {
   logger.info(`Server listening port http://localhost:${port}`);
