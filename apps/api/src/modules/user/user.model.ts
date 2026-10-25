@@ -1,13 +1,13 @@
 import mongoose, { Schema, type HydratedDocument } from "mongoose";
 
 export interface IUser {
-  userName: String;
-  email: String;
-  phoneNumber: String;
-  passwordHash: String;
+  userName: string;
+  email: string;
+  phoneNumber: string;
+  passwordHash: string;
   status: boolean;
-  address: String;
-  city: String;
+  address: string;
+  city: string;
 }
 
 const UserSchema = new Schema<IUser>(
@@ -47,5 +47,5 @@ const UserSchema = new Schema<IUser>(
 
 UserSchema.index({ email: 1 }, { unique: true });
 
-export const user = mongoose.model<IUser>("User", UserSchema);
+export const User = mongoose.model<IUser>("User", UserSchema);
 export type UserDocument = HydratedDocument<IUser>;
