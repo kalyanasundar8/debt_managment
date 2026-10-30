@@ -21,6 +21,6 @@ export const AuthMiddleware = (
     req.user = verifiedUser;
     next();
   } catch (error) {
-    res.status(403).json({ message: "Invalid or Expired token!" });
+    res.status(403).json({ message: "The token is invalid or Expired!" });
   }
 };
