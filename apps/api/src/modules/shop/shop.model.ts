@@ -1,6 +1,12 @@
-import mongoose, { model, Schema, type HydratedDocument } from "mongoose";
+import mongoose, {
+  model,
+  Schema,
+  Types,
+  type HydratedDocument,
+} from "mongoose";
 
 export interface IShop {
+  ownerId: Types.ObjectId;
   shopName: string;
   email: string;
   passwordHash: string;
@@ -9,6 +15,10 @@ export interface IShop {
 
 const ShopSchema = new Schema<IShop>(
   {
+    ownerId: {
+      type: mongoose.Types.ObjectId,
+      required: true,
+    },
     shopName: {
       type: String,
       required: true,

@@ -18,6 +18,7 @@ export const AuthMiddleware = (
 
   try {
     const verifiedUser = JWT.verify(token, process.env.JWT_ACCESS_SECRET!);
+    console.log("VERIFIED USER: ", verifiedUser);
     req.user = verifiedUser;
     next();
   } catch (error) {

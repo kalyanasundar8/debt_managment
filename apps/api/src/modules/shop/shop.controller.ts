@@ -8,7 +8,9 @@ export class ShopController {
     res: Response,
   ): Promise<void> {
     const data = req.body;
-    const result = await ShopService.createShop(data);
+    const userId = req.user?.id;
+    console.log("USER ID: ", userId);
+    const result = await ShopService.createShop(data, userId);
 
     res.status(201).json({
       success: true,

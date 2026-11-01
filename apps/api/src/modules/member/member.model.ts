@@ -1,25 +1,37 @@
 import mongoose, { Schema, Types, type HydratedDocument } from "mongoose";
 
 export enum Roles {
-  owner = "OWNER",
   manager = "MANAGER",
   cashier = "CASHIER",
   employee = "EMPLOYEE",
 }
 
 export interface IMember {
-  userId: Types.ObjectId;
   shopId: Types.ObjectId;
+  memberName: string;
+  email: string;
+  phoneNumber: string;
+  passwordHash: string;
+  address: string;
+  city: string;
   role: Roles;
   status: boolean;
+  joiningDate: Date;
 }
 
 const MemberSchema = new Schema<IMember>(
   {
-    userId: {
-      type: Schema.Types.ObjectId,
+    memberName: {
+      type: String,
       required: true,
-      ref: "User",
+    },
+    email: {
+      type: String,
+      required: true,
+    },
+    passwordHash: {
+      type: String,
+      required: true,
     },
     shopId: {
       type: Schema.Types.ObjectId,
@@ -35,11 +47,15 @@ const MemberSchema = new Schema<IMember>(
       type: Boolean,
       required: true,
     },
+    joiningDate: {
+      type: Date,
+      required: true,
+    },
   },
   { timestamps: true },
 );
 
-MemberSchema.index({ userId: 1, shopId: 1 }, { unique: true });
+MemberSchema.index({ email: 1, shopId: 1 }, { unique: true });
 
 export const Member = mongoose.model<IMember>("Member", MemberSchema);
 export type MemberDocument = HydratedDocument<IMember>;

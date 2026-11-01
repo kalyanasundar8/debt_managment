@@ -4,7 +4,7 @@ import { Shop, type IShop } from "./shop.model.js";
 
 export class ShopService {
   // Create new shop
-  static async createShop(shopData: IShop) {
+  static async createShop(shopData: IShop, userId: string) {
     // Check already the shop name exists
     const isShopExists = await Shop.findOne({ email: shopData.email });
 
@@ -17,12 +17,14 @@ export class ShopService {
 
     const shop = await Shop.create({
       ...shopData,
+      ownerId: userId,
       passwordHash,
       createdAt: Date.now(),
     });
 
     return {
-      id: shop._id,
+      ownerId: shop.ownerId,
+      shopId: shop._id,
       name: shop.shopName,
       email: shop.email,
       createdAt: shop.createdAt,

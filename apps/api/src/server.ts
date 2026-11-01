@@ -5,6 +5,7 @@ import shopRoutes from "./modules/shop/shop.routes.js";
 import { logger } from "./shared/utils/logger.js";
 import { ConnectMongo } from "./shared/config/mongo.connect.js";
 import userRoutes from "./modules/user/user.routes.js";
+import memberRoutes from "./modules/member/member.routes.js";
 
 const app = express();
 
@@ -17,6 +18,7 @@ const port = process.env.PORT || 3001;
 
 app.use("/api/shops", shopRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/members", memberRoutes);
 
 app.listen(port, () => {
   logger.info(`Server listening port http://localhost:${port}`);
