@@ -7,13 +7,8 @@ export enum Roles {
 }
 
 export interface IMember {
+  userId: Types.ObjectId;
   shopId: Types.ObjectId;
-  memberName: string;
-  email: string;
-  phoneNumber: string;
-  passwordHash: string;
-  address: string;
-  city: string;
   role: Roles;
   status: boolean;
   joiningDate: Date;
@@ -21,17 +16,10 @@ export interface IMember {
 
 const MemberSchema = new Schema<IMember>(
   {
-    memberName: {
-      type: String,
+    userId: {
+      type: Schema.Types.ObjectId,
       required: true,
-    },
-    email: {
-      type: String,
-      required: true,
-    },
-    passwordHash: {
-      type: String,
-      required: true,
+      ref: "User",
     },
     shopId: {
       type: Schema.Types.ObjectId,
@@ -45,17 +33,22 @@ const MemberSchema = new Schema<IMember>(
     },
     status: {
       type: Boolean,
+      default: true,
       required: true,
     },
     joiningDate: {
       type: Date,
+      default: Date.now,
       required: true,
     },
   },
   { timestamps: true },
 );
 
-MemberSchema.index({ email: 1, shopId: 1 }, { unique: true });
+MemberSchema.index({ userId: 1, shopId: 1 }, { unique: true });
 
 export const Member = mongoose.model<IMember>("Member", MemberSchema);
 export type MemberDocument = HydratedDocument<IMember>;
+
+export const isRole = (value: unknown): value is Roles =>
+  Object.values(Roles).some((role) => role === value);

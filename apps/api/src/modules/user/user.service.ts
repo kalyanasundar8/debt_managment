@@ -63,7 +63,7 @@ export class UserService {
     }
 
     const access = generateAccessToken(isUserExists._id.toString());
-    const refresh = generateAccessToken(isUserExists._id.toString());
+    const refresh = generateRefreshToken(isUserExists._id.toString());
 
     return {
       id: isUserExists._id,

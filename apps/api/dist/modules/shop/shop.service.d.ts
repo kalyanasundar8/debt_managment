@@ -1,9 +1,10 @@
-import { type IShop } from "./shop.model.js";
+import { Types } from "mongoose";
 export declare class ShopService {
-    static createShop(shopData: IShop): Promise<{
-        id: import("mongoose").Types.ObjectId;
+    static createShop(shopName: string, userId: string): Promise<{
+        ownerId: Types.ObjectId;
+        shopId: Types.ObjectId;
         name: string;
-        email: string;
+        createdAt: Date;
     }>;
     static updateShop(): Promise<void>;
     static deleteShop(): Promise<void>;

@@ -1,39 +1,91 @@
 import { AppError } from "../../shared/helpers/custom.error.js";
-import { Member, Roles, type IMember } from "./member.model.js";
-import bcrypt from "bcryptjs";
+import { Member, Roles, isRole } from "./member.model.js";
+import { Shop } from "../shop/shop.model.js";
+import { User } from "../user/user.model.js";
+import { Types } from "mongoose";
 
 export class MemberService {
   // Add a new member
-  static async AddMember(data: IMember) {
-    // Check member is already present
-    const isMemberExists = await Member.findOne({ email: data.email });
-
-    if (isMemberExists) {
-      throw new AppError("Member already exists in this email", 400);
+  static async addMember(
+    data: { email: string; role: Roles },
+    shopId: string,
+    actingUserId: string,
+  ) {
+    if (
+      !Types.ObjectId.isValid(shopId) ||
+      !Types.ObjectId.isValid(actingUserId)
+    ) {
+      throw new AppError("Invalid shop or user ID", 400);
     }
 
-    const isValidRole = Object.values(Roles).includes(data.role as Roles);
-
-    if (!isValidRole) {
+    if (!isRole(data.role)) {
       throw new AppError("Invalid role", 400);
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(data.passwordHash, salt);
+    const shopObjectId = new Types.ObjectId(shopId);
+    const actingUserObjectId = new Types.ObjectId(actingUserId);
+    const shop = await Shop.findById(shopObjectId).select("ownerId");
+
+    if (!shop) {
+      throw new AppError("Shop not found", 404);
+    }
+
+    const isOwner = shop.ownerId.equals(actingUserObjectId);
+    if (!isOwner) {
+      const actingMembership = await Member.findOne({
+        userId: actingUserObjectId,
+        shopId: shopObjectId,
+        role: Roles.manager,
+        status: true,
+      });
+
+      if (!actingMembership) {
+        throw new AppError(
+          "You are not allowed to manage this shop's members",
+          403,
+        );
+      }
+
+      if (data.role === Roles.manager) {
+        throw new AppError(
+          "Only the shop owner can assign the manager role",
+          403,
+        );
+      }
+    }
+
+    const email = data.email.trim().toLowerCase();
+    const user = await User.findOne({ email });
+
+    if (!user) {
+      throw new AppError("The member must create a user account first", 404);
+    }
+
+    if (shop.ownerId.equals(user._id)) {
+      throw new AppError("The shop owner does not need a member record", 400);
+    }
+
+    const existingMembership = await Member.findOne({
+      userId: user._id,
+      shopId: shopObjectId,
+    });
+
+    if (existingMembership) {
+      throw new AppError("This user is already a member of the shop", 409);
+    }
 
     const member = await Member.create({
-      ...data,
-      passwordHash: hashedPassword,
-      status: true,
+      userId: user._id,
+      shopId: shopObjectId,
+      role: data.role,
     });
 
     return {
       memberId: member._id,
+      userId: member.userId,
       shopId: member.shopId,
-      email: member.email,
-      phoneNumber: member.phoneNumber,
-      address: member.address,
-      city: member.city,
+      userName: user.userName,
+      email: user.email,
       role: member.role,
       status: member.status,
       joiningDate: member.joiningDate,

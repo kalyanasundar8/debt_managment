@@ -8,7 +8,7 @@ export const AuthMiddleware = (
 ) => {
   const authHeader = req.headers["authorization"];
 
-  const token = authHeader && authHeader.split(" ")[1];
+  const token = authHeader?.match(/^Bearer\s+(.+)$/i)?.[1];
 
   if (!token) {
     return res.status(401).json({
@@ -18,8 +18,16 @@ export const AuthMiddleware = (
 
   try {
     const verifiedUser = JWT.verify(token, process.env.JWT_ACCESS_SECRET!);
-    console.log("VERIFIED USER: ", verifiedUser);
-    req.user = verifiedUser;
+    if (
+      typeof verifiedUser === "string" ||
+      typeof verifiedUser.id !== "string"
+    ) {
+      return res
+        .status(403)
+        .json({ message: "The token is invalid or Expired!" });
+    }
+
+    req.user = { id: verifiedUser.id };
     next();
   } catch (error) {
     res.status(403).json({ message: "The token is invalid or Expired!" });

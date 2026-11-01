@@ -1,4 +1,5 @@
-import type { NextFunction, Request, Response } from "express";
+import type { Request, Response } from "express";
+import { AppError } from "../../shared/helpers/custom.error.js";
 import { ShopService } from "./shop.service.js";
 
 export class ShopController {
@@ -7,10 +8,22 @@ export class ShopController {
     req: Request,
     res: Response,
   ): Promise<void> {
-    const data = req.body;
     const userId = req.user?.id;
-    console.log("USER ID: ", userId);
-    const result = await ShopService.createShop(data, userId);
+    if (!userId) {
+      throw new AppError("Authentication required", 401);
+    }
+
+    const body: unknown = req.body;
+    if (typeof body !== "object" || body === null) {
+      throw new AppError("Request body must be an object", 400);
+    }
+
+    const { shopName } = body as { shopName?: unknown };
+    if (typeof shopName !== "string") {
+      throw new AppError("Shop name is required", 400);
+    }
+
+    const result = await ShopService.createShop(shopName, userId);
 
     res.status(201).json({
       success: true,

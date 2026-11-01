@@ -1,9 +1,11 @@
-import { User } from "../modules/user/user.model.ts";
-
 declare global {
   namespace Express {
+    interface AuthenticatedUser {
+      id: string;
+    }
+
     interface Request {
-      user?: User;
+      user?: AuthenticatedUser;
     }
   }
 }

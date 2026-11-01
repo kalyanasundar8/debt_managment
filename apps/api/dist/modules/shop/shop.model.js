@@ -1,14 +1,11 @@
-import mongoose, { model, Schema } from "mongoose";
+import mongoose, { model, Schema, Types } from "mongoose";
 const ShopSchema = new Schema({
+    ownerId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+        ref: "User",
+    },
     shopName: {
-        type: String,
-        required: true,
-    },
-    email: {
-        type: String,
-        required: true,
-    },
-    hashedPassword: {
         type: String,
         required: true,
     },
@@ -17,6 +14,5 @@ const ShopSchema = new Schema({
         required: true,
     },
 }, { timestamps: true });
-ShopSchema.index({ email: 1 }, { unique: true });
 export const Shop = model("Shop", ShopSchema);
 //# sourceMappingURL=shop.model.js.map

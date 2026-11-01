@@ -6,9 +6,9 @@ import { AuthMiddleware } from "../../shared/middlewares/AuthMiddleware.js";
 const memberRoutes = express.Router();
 
 memberRoutes.post(
-  "/create",
+  "/:shopId/members",
   AuthMiddleware,
-  asyncHandler(MembersController.AddMember),
+  asyncHandler(MembersController.addMember),
 );
 
 export default memberRoutes;

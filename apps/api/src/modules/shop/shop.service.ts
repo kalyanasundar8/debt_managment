@@ -1,24 +1,22 @@
-import bcrypt from "bcryptjs";
 import { AppError } from "../../shared/helpers/custom.error.js";
-import { Shop, type IShop } from "./shop.model.js";
+import { Shop } from "./shop.model.js";
+import { Types } from "mongoose";
 
 export class ShopService {
   // Create new shop
-  static async createShop(shopData: IShop, userId: string) {
-    // Check already the shop name exists
-    const isShopExists = await Shop.findOne({ email: shopData.email });
-
-    if (isShopExists) {
-      throw new AppError("Already shop exist in this mail", 400);
+  static async createShop(shopName: string, userId: string) {
+    const normalizedShopName = shopName.trim();
+    if (!normalizedShopName) {
+      throw new AppError("Shop name is required", 400);
     }
 
-    const salt = await bcrypt.genSalt(10);
-    const passwordHash = await bcrypt.hash(shopData.passwordHash, salt);
+    if (!Types.ObjectId.isValid(userId)) {
+      throw new AppError("Invalid owner ID", 400);
+    }
 
     const shop = await Shop.create({
-      ...shopData,
-      ownerId: userId,
-      passwordHash,
+      shopName: normalizedShopName,
+      ownerId: new Types.ObjectId(userId),
       createdAt: Date.now(),
     });
 
@@ -26,7 +24,6 @@ export class ShopService {
       ownerId: shop.ownerId,
       shopId: shop._id,
       name: shop.shopName,
-      email: shop.email,
       createdAt: shop.createdAt,
     };
   }

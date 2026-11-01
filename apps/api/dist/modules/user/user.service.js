@@ -1,0 +1,68 @@
+import bcrypt from "bcryptjs";
+import { AppError } from "../../shared/helpers/custom.error.js";
+import { User } from "./user.model.js";
+import { generateAccessToken, generateRefreshToken, } from "../../shared/helpers/generate.token.js";
+export class UserService {
+    // Create new user
+    static async createUser(userData) {
+        // Check the email format
+        // Check user exists in the collection
+        const isUserExists = await User.findOne({ email: userData.email });
+        // If exists: throw error
+        if (isUserExists) {
+            throw new AppError("User already exists in this email", 400);
+        }
+        // Check security issues in password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(userData.passwordHash, salt);
+        // Not exists: create document
+        const user = await User.create({
+            ...userData,
+            passwordHash: hashedPassword,
+        });
+        // Generate access & refresh tokens
+        const access = generateAccessToken(user._id.toString());
+        const refresh = generateRefreshToken(user._id.toString());
+        // Return user with token
+        return {
+            id: user._id,
+            userName: user.userName,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            address: user.address,
+            city: user.city,
+            accessToken: access,
+            refreshToken: refresh,
+        };
+    }
+    // SignIn User
+    static async signInUser(data) {
+        const isUserExists = await User.findOne({ email: data.email });
+        if (!isUserExists) {
+            throw new AppError("No data found with this email", 400);
+        }
+        const decryptedPassword = await bcrypt.compare(data.passwordHash, isUserExists.passwordHash);
+        if (!decryptedPassword) {
+            throw new AppError("Password doesn't match", 400);
+        }
+        const access = generateAccessToken(isUserExists._id.toString());
+        const refresh = generateRefreshToken(isUserExists._id.toString());
+        return {
+            id: isUserExists._id,
+            userName: isUserExists.userName,
+            email: isUserExists.email,
+            phoneNumber: isUserExists.phoneNumber,
+            address: isUserExists.address,
+            city: isUserExists.city,
+            accessToken: access,
+            refreshToken: refresh,
+        };
+    }
+    // Update user
+    static async updateUser() { }
+    // Delete user
+    static async deleteUser() { }
+    // Get user profile
+    static async getUserProfile() { }
+}
+//# sourceMappingURL=user.service.js.map
