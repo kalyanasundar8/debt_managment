@@ -6,6 +6,11 @@ import {
   generateRefreshToken,
 } from "../../shared/helpers/generate.token.js";
 
+export interface SignInData {
+  email: string;
+  passwordHash: string;
+}
+
 export class UserService {
   // Create new user
   static async createUser(userData: IUser) {
@@ -35,6 +40,38 @@ export class UserService {
       phoneNumber: user.phoneNumber,
       address: user.address,
       city: user.city,
+      accessToken: access,
+      refreshToken: refresh,
+    };
+  }
+
+  // SignIn User
+  static async signInUser(data: SignInData) {
+    const isUserExists = await User.findOne({ email: data.email });
+
+    if (!isUserExists) {
+      throw new AppError("No data found with this email", 400);
+    }
+
+    const decryptedPassword = await bcrypt.compare(
+      data.passwordHash,
+      isUserExists.passwordHash,
+    );
+
+    if (!decryptedPassword) {
+      throw new AppError("Password doesn't match", 400);
+    }
+
+    const access = generateAccessToken(isUserExists._id.toString());
+    const refresh = generateAccessToken(isUserExists._id.toString());
+
+    return {
+      id: isUserExists._id,
+      userName: isUserExists.userName,
+      email: isUserExists.email,
+      phoneNumber: isUserExists.phoneNumber,
+      address: isUserExists.address,
+      city: isUserExists.city,
       accessToken: access,
       refreshToken: refresh,
     };

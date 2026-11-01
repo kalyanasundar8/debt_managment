@@ -10,4 +10,13 @@ export class UserController {
       data: result,
     });
   }
+
+  static async signInUser(req: Request, res: Response) {
+    const data = req.body;
+    const result = await UserService.signInUser(data);
+    res.status(201).json({
+      success: true,
+      data: result,
+    });
+  }
 }

@@ -5,5 +5,6 @@ import { UserController } from "./user.controller.js";
 const userRoutes = express.Router();
 
 userRoutes.post("/create", asyncHandler(UserController.createUser));
+userRoutes.post("/signin", asyncHandler(UserController.signInUser));
 
 export default userRoutes;
